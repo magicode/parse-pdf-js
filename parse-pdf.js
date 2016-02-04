@@ -974,7 +974,7 @@ function parseXref( buff , addpos ){
             var xrefStream = getStreamSync(xrefObj,{},buff);
             
             if(xrefStream){
-                fs.writeFileSync("xrefStream_"+ xrefObj.id, xrefStream);
+                //fs.writeFileSync("xrefStream_"+ xrefObj.id, xrefStream);
             }
             
             var posStream = 0;
