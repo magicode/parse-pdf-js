@@ -257,6 +257,11 @@ parsePdf.prototype.getTexts = function( callback ){
 };
 
 function getStream(obj, objs , buffer , callback ){
+        
+        if(!obj || !obj.objinfo){
+            return callback(new Error("not-have-stream"));
+        }
+        
         var contentsLength = obj.objinfo.Length;
         var refLength = getRef(contentsLength);
         if(refLength) contentsLength = objs[refLength].content;

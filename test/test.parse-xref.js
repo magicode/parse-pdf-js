@@ -11,8 +11,8 @@ var buff =  new Buffer("\r\nxref\r\n\
 var ret = parsepdf.parseXref(buff,2);
 
 ret.should.eql({ refs: 
-   [ { position: 16 ,type: 'f' },
-     { position: 1833 ,type: 'n' }
+   [ { offset: 16 ,type: 'f' },
+     { offset: 1833 ,type: 'n' }
      ] });
      
 //console.log(ret);
