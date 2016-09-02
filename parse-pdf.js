@@ -1038,10 +1038,15 @@ function parseXref( buff , addpos ){
 function findXrefPos( buff ){
     var offset = buff.length;
     var linestart = 0;
+    var eof;
+    var eofMaxTry = 10;
     
-    linestart = readLineReverse(buff,offset);
-    var eof = buff.slice(linestart,offset).toString('utf8');
-    offset = linestart;
+    do{
+        linestart = readLineReverse(buff,offset);
+        eof = buff.slice(linestart,offset).toString('utf8').trim();
+        offset = linestart;
+    }while(eof === '' && eofMaxTry--);
+    
     if(eof.indexOf('%%EOF') == -1)
         throw new Error('no find eof');
         
