@@ -29,6 +29,7 @@ module.exports.parseObj = parseObj;
 module.exports.parseObjInfo = parseObjInfo;
 module.exports.parseContent = parseContent;
 module.exports.getAttr = getAttr;
+module.exports.getStreamSync = getStreamSync;
 
 function parsePdf( fileBuffer , callback ){
     var xrefPosition = findXrefPos(fileBuffer);
