@@ -30,6 +30,8 @@ module.exports.parseObjInfo = parseObjInfo;
 module.exports.parseContent = parseContent;
 module.exports.getAttr = getAttr;
 module.exports.getStreamSync = getStreamSync;
+module.exports.endObj = endObj;
+
 
 function parsePdf( fileBuffer , callback ){
     var xrefPosition = findXrefPos(fileBuffer);
@@ -709,7 +711,7 @@ function getRef(str){
 }
 
 function parseObjInfo(str){
-
+    
     var retObjInfo = {};
     
     var NON_KEY_CHARS = {' ': true, '\t': true, '\n':true ,'\r': true , '[':true , '(': true , "/": true, "<": true };
@@ -752,6 +754,10 @@ function parseObjInfo(str){
     function onValueBrackets(char,i,str){
         if(char === currValueBracketsStart) currValueBracketsCount++;
         if(char === currValueBracketsEnd) currValueBracketsCount--;
+        if(char === '/' && currValueBracketsStart == '['){
+            status = onValue;
+            return status(char,i,str);
+        }
         currValue += char;
         if(currValueBracketsCount == 0){
             status = onValue;
@@ -863,17 +869,24 @@ function parseObj( buff , pos ){
     
 
     var schar = String.fromCharCode(buff[pos]);
+    var scharNext  = String.fromCharCode(buff[pos + 1]);
     
-    if(schar == '<'){
+    if(schar === '<' && scharNext === '<'){
         //parse objinfo;
-        var objinfo = schar;
+        var objinfo = schar + scharNext;
         var arrowCount = 1;
+        let last_schar;
+        pos++;
         pos++;
         while(pos <= buff.length){
             schar = String.fromCharCode(buff[pos]);
-            objinfo+=schar;
-            if(schar=='<')arrowCount++;
-            if(schar=='>')arrowCount--;
+            
+            if(schar === '<' && last_schar === schar) arrowCount++;
+            if(schar === '>' && last_schar === schar) arrowCount--;
+            //if(schar === '<') arrowCount++;
+            //if(schar === '>') arrowCount--;
+            objinfo += schar;
+            last_schar = schar;
             pos++;
             if(arrowCount == 0){
                 break;
@@ -890,7 +903,6 @@ function parseObj( buff , pos ){
             while( isSpace(buff[pos]) && maxCountNorR-- ) pos++;
             obj.streamPosition = pos; 
         }
-        
     }else{
         //getcontect;
         var indexEndObj = buff.indexOf('endobj',pos);
@@ -903,6 +915,21 @@ function parseObj( buff , pos ){
     obj.id = idObj;
     
     return obj;
+}
+
+function endObj(buff,pos){
+    
+    while(pos < buff.length){
+        while( isNorR(buff[pos]) && pos < buff.length) pos++;
+        let end = pos;
+        
+        while( !isNorR(buff[end]) && end < buff.length) end++;
+        let token = buff.toString('utf8',pos,end);
+        
+        if(token == 'endobj') return end;
+            
+        pos = end;
+    }
 }
 
 function parseXref( buff , addpos ){
