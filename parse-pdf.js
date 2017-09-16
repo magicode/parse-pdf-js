@@ -1,9 +1,6 @@
 
 const async = require("async");
 const zlib = require("zlib");
-const fs = require("fs");
-
-require('buffertools').extend();
 
 
 module.exports = {};
