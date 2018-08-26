@@ -1063,14 +1063,14 @@ function parseXref( buff , addpos ){
 function findXrefPos( buff ){
     var offset = buff.length;
     var linestart = 0;
-    var eof;
-    var eofMaxTry = 10;
+    var eof = '';
+    var eofMaxTry = 500;
     
     do{
         linestart = readLineReverse(buff,offset);
-        eof = buff.slice(linestart,offset).toString('utf8').trim();
+        eof = buff.slice(linestart,offset).toString('utf8').trim() || '';
         offset = linestart;
-    }while(eof === '' && eofMaxTry--);
+    }while(eof.indexOf('%%EOF') == -1 && eofMaxTry--);
     
     if(eof.indexOf('%%EOF') == -1)
         throw new Error('no find eof');
